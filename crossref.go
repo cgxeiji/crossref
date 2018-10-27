@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/kr/pretty"
+	log "github.com/sirupsen/logrus"
 )
 
 type Client struct {
@@ -17,18 +19,30 @@ type Client struct {
 
 const api string = "https://api.crossref.org"
 
+func Debug() {
+	log.SetLevel(log.DebugLevel)
+	log.Info("Changed to debugging mode")
+}
+
 func (c *Client) String() string {
 	return fmt.Sprintf("App: %s, MailTo: %s", c.appname, c.mailto)
 }
 
 func (c *Client) WorksJSON(doi, sel string) ([]byte, error) {
+	log.WithFields(log.Fields{
+		"client": c,
+	}).Debug("JSON requested")
+
 	url := fmt.Sprintf("%s/works?filter=doi:%s", api, doi)
 	if sel != "" {
 		url = fmt.Sprintf("%s&select=%s", url, sel)
 	}
 	url = fmt.Sprintf("%s&mailto=%s", url, c.mailto)
 
-	fmt.Println(url)
+	log.WithFields(log.Fields{
+		"url": url,
+	}).Debug("Requesting information")
+
 	r, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -67,7 +81,8 @@ func (w *Work) populate(content map[string]interface{}) {
 	for _, v := range content["container-title"].([]interface{}) {
 		w.BookTitles = append(w.BookTitles, getS(v))
 	}
-	for _, v := range content["author"].([]interface{}) {
+	authors, _ := content["author"].([]interface{})
+	for _, v := range authors {
 		a := v.(map[string]interface{})
 		co := Contributor{
 			Last:  getS(a["family"]),
@@ -101,12 +116,70 @@ func (c *Client) Works(doi string) (*Work, error) {
 
 	items := data["message"].(map[string]interface{})["items"].([]interface{})
 	content := items[0].(map[string]interface{})
-	pretty.Println(content)
+	log.Debug(pretty.Sprint(content))
 
 	w := Work{}
 	w.populate(content)
 
 	return &w, nil
+}
+
+func (c *Client) QueryJSON(search string) ([]byte, error) {
+	log.WithFields(log.Fields{
+		"client": c,
+	}).Debug("Query requested")
+
+	rx, err := regexp.Compile("[^[:alnum:][:space:]]+")
+	if err != nil {
+		return nil, err
+	}
+
+	s := rx.ReplaceAllString(search, "")
+	s = strings.Replace(s, " ", "+", -1)
+
+	url := fmt.Sprintf("%s/works?query=%s&rows=10", api, s)
+	url = fmt.Sprintf("%s&mailto=%s", url, c.mailto)
+
+	log.WithFields(log.Fields{
+		"url": url,
+	}).Debug("Requesting information")
+
+	r, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	raw, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return raw, nil
+}
+
+func (c *Client) Query(search string) ([]*Work, error) {
+	js, err := c.QueryJSON(search)
+	works := []*Work{}
+	if err != nil {
+		return works, err
+	}
+
+	var data map[string]interface{}
+	json.Unmarshal(js, &data)
+
+	items, _ := data["message"].(map[string]interface{})["items"].([]interface{})
+
+	for _, v := range items {
+		content := v.(map[string]interface{})
+		log.Debug(pretty.Sprint(content))
+		w := Work{}
+		w.populate(content)
+
+		works = append(works, &w)
+	}
+
+	return works, nil
 }
 
 func getS(i interface{}) string {
