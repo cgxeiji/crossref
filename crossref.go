@@ -65,7 +65,9 @@ type Contributor struct {
 type Work struct {
 	Type       string
 	Titles     []string
+	Title      string
 	BookTitles []string
+	BookTitle  string
 	Authors    []Contributor
 	Date       string
 	DOI        string
@@ -78,9 +80,13 @@ func (w *Work) populate(content map[string]interface{}) {
 	for _, v := range content["title"].([]interface{}) {
 		w.Titles = append(w.Titles, getS(v))
 	}
+	w.Title = w.Titles[0]
+
 	for _, v := range content["container-title"].([]interface{}) {
 		w.BookTitles = append(w.BookTitles, getS(v))
 	}
+	w.BookTitle = w.BookTitles[0]
+
 	authors, _ := content["author"].([]interface{})
 	for _, v := range authors {
 		a := v.(map[string]interface{})
