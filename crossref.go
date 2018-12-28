@@ -2,6 +2,7 @@ package crossref
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -163,6 +164,10 @@ func (c *Client) Works(doi string) (*Work, error) {
 
 	var data map[string]interface{}
 	json.Unmarshal(js, &data)
+	log.Debug(pretty.Sprint(data))
+	if data["status"] == "failed" {
+		return &Work{}, errors.New("failed to retreive metadata from crossref")
+	}
 
 	items := data["message"].(map[string]interface{})["items"].([]interface{})
 	content := items[0].(map[string]interface{})
