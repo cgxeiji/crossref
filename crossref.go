@@ -170,6 +170,9 @@ func (c *Client) Works(doi string) (*Work, error) {
 	}
 
 	items := data["message"].(map[string]interface{})["items"].([]interface{})
+	if len(items) <= 0 {
+		return &Work{}, errors.New("failed to retreive metadata from crossref")
+	}
 	content := items[0].(map[string]interface{})
 	log.Debug(pretty.Sprint(content))
 
