@@ -37,7 +37,7 @@ func (c *Client) DOIJSON(doi string) ([]byte, error) {
 		"url": req.URL.String(),
 	}).Debug("Requesting information")
 
-	resp, err := c.Client.Do(req)
+	resp, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
