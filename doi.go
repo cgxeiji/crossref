@@ -15,7 +15,7 @@ import (
 func (c *Client) DOIJSON(doi string) ([]byte, error) {
 	log.WithFields(log.Fields{
 		"client": c,
-	}).Debug("JSON requested")
+	}).Debug("DOI requested")
 
 	if doi == "" {
 		return nil, ErrEmptyQuery
@@ -61,6 +61,7 @@ func (c *Client) DOI(doi string) (*Work, error) {
 	var data doiJSON
 	json.Unmarshal(js, &data)
 	log.Debug(pretty.Sprint(data))
+
 	if data.Status != "ok" {
 		return &Work{}, ErrZeroWorks
 	}
