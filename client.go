@@ -2,6 +2,7 @@ package crossref
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -34,4 +35,15 @@ func NewClient(appname, malito string) *Client {
 // String implements the Stringer interface.
 func (c *Client) String() string {
 	return fmt.Sprintf("App: %s, MailTo: %s", c.appname, c.mailto)
+}
+
+func (c *Client) newRequest(method, url string, body io.Reader) (*http.Request, error) {
+	r, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	r.Header.Add("User-Agent", fmt.Sprintf("%s/0.0 (mailto: %s)", c.appname, c.mailto))
+
+	return r, nil
 }

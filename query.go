@@ -2,9 +2,7 @@ package crossref
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"net/http"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -21,12 +19,10 @@ func (c *Client) QueryJSON(search string) ([]byte, error) {
 		return nil, ErrEmptyQuery
 	}
 
-	req, err := http.NewRequest("GET", api, nil)
+	req, err := c.newRequest("GET", api, nil)
 	if err != nil {
 		return nil, err
 	}
-
-	req.Header.Add("User-Agent", fmt.Sprintf("%s (mailto: %s)", c.appname, c.mailto))
 
 	q := req.URL.Query()
 	q.Add("query", search)

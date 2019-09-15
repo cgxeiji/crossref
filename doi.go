@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 
 	"github.com/kr/pretty"
 	log "github.com/sirupsen/logrus"
@@ -22,12 +21,10 @@ func (c *Client) DOIJSON(doi string) ([]byte, error) {
 	}
 
 	url := fmt.Sprintf("%s/%s", api, doi)
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := c.newRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
-
-	req.Header.Add("User-Agent", fmt.Sprintf("%s (mailto: %s)", c.appname, c.mailto))
 
 	q := req.URL.Query()
 	q.Add("mailto", c.mailto)
