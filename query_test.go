@@ -20,8 +20,9 @@ func TestClientQueryJSON(t *testing.T) {
 		var data queryJSON
 		json.Unmarshal(raw, &data)
 
+		t.Log("\n\ttotal results =", data.Message.TotalResults)
 		if data.Message.TotalResults == 0 {
-			t.Error("known existing entry could not be found")
+			t.Fatal("known existing entry could not be found")
 		}
 
 		got := data.Message.Items[0].Titles[0]
@@ -67,7 +68,7 @@ func TestClientQuery(t *testing.T) {
 
 		works, err := client.Query(want)
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 
 		got := works[0].Title

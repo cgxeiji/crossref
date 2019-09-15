@@ -13,12 +13,15 @@ func TestClientDOIJSON(t *testing.T) {
 
 		raw, err := client.DOIJSON("10.1145/3290605.3300843")
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 
 		var data doiJSON
 		json.Unmarshal(raw, &data)
 
+		if data.Work == nil {
+			t.Fatal("could not unmarshal json to work")
+		}
 		got := data.Work.Titles[0]
 
 		if want != got {
@@ -29,7 +32,7 @@ func TestClientDOIJSON(t *testing.T) {
 	t.Run("Non-existing Entry", func(t *testing.T) {
 		raw, err := client.DOIJSON("10.1145/3290605.330084") // deleted the last character from DOI
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 
 		var data doiJSON
@@ -56,7 +59,7 @@ func TestClientDOI(t *testing.T) {
 
 		work, err := client.DOI("10.1145/3290605.3300843")
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 
 		got := work.Title
