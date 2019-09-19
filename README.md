@@ -1,7 +1,7 @@
 # crossref
 Access to Crossref API with Go
 
-Full documentation of this packages is [here](https://godoc.org/github.com/cgxeiji/crossref).
+Full documentation of this package is [here](https://godoc.org/github.com/cgxeiji/crossref).
 
 For a detailed explanation of the JSON fields, go to [Crossref API
 Documentation](https://github.com/Crossref/rest-api-doc/blob/master/api_format.md).
