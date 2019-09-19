@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestClientDOIJSON(t *testing.T) {
+func TestClient_DOIJSON(t *testing.T) {
 	client := NewClient("Crossref Go", "mail@example.com")
 
 	t.Run("Existing Entry", func(t *testing.T) {
@@ -51,7 +51,7 @@ func TestClientDOIJSON(t *testing.T) {
 	})
 }
 
-func TestClientDOI(t *testing.T) {
+func TestClient_DOI(t *testing.T) {
 	client := NewClient("Crossref Go", "mail@example.com")
 
 	t.Run("Existing Entry", func(t *testing.T) {

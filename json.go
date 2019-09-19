@@ -6,10 +6,10 @@ import (
 )
 
 type queryJSON struct {
-	Status  string           `json:"status"`
-	Type    string           `json:"message-type"`
-	Version string           `json:"message-version"`
-	Message queryMessageJSON `json:"message"`
+	Status  string            `json:"status"`
+	Type    string            `json:"message-type"`
+	Version string            `json:"message-version"`
+	Message *queryMessageJSON `json:"message"`
 }
 
 type queryMessageJSON struct {
@@ -35,6 +35,11 @@ type Contributor struct {
 	Last string `json:"family"`
 }
 
+// String implements the Stringer interface.
+func (c *Contributor) String() string {
+	return c.Last + ", " + c.First
+}
+
 // Work is the processed JSON for direct access to the information.
 type Work struct {
 	Type string
@@ -46,10 +51,10 @@ type Work struct {
 	BookTitles []string `json:"container-title"`
 	BookTitle  string
 
-	Authors []Contributor `json:"author"`
-	Editors []Contributor `json:"editor"`
+	Authors []*Contributor `json:"author"`
+	Editors []*Contributor `json:"editor"`
 
-	Issued dateParts `json:"issued"`
+	Issued *dateParts `json:"issued"`
 	Date   string
 
 	Publisher string `json:"publisher"`

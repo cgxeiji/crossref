@@ -49,8 +49,9 @@ func (c *Client) QueryJSON(search string) ([]byte, error) {
 	return raw, nil
 }
 
-// Query returns a list of processed Work metadata from a search query. If no
-// works are found, it returns an ErrZeroWorks error.
+// Query returns a list of processed Work metadata from a search query. A
+// search term must be specified, otherwise it will return an ErrEmptyQuery
+// error. If no works are found, it returns an ErrZeroWorks error.
 func (c *Client) Query(search string) ([]*Work, error) {
 	js, err := c.QueryJSON(search)
 	works := []*Work{}
