@@ -1,35 +1,63 @@
 # crossref
 Access to Crossref API with Go
 
+Full documentation of this packages is [here](https://godoc.org/github.com/cgxeiji/crossref).
+
 For a detailed explanation of the JSON fields, go to [Crossref API
 Documentation](https://github.com/Crossref/rest-api-doc/blob/master/api_format.md).
 
 ## Example Code
 ``` Go
+package main
+
+import (
+	"fmt"
+
+	"github.com/cgxeiji/crossref"
+)
+
+var client = crossref.NewClient("Crossref Go", "mail@example.com")
+
 func main() {
-    // If you want to debug the library, uncomment the following line:
-    // crossref.Debug()
-    client := crossref.NewClient("Crossref Go", "mail@example.com")
+	// If you want to debug the library, uncomment the following line:
+	// crossref.Debug()
 
-    // Retrieve information directly from a DOI
-    work, err := client.DOI("10.1145/3290605.3300843")
-    if err != nil {
-        panic(err)
-    }
+	// Search for a publication by doing a query. This returns up to 10 works
+	// that match the query terms.
+	search := "Slow Robots for Unobtrusive Posture Correction"
+	works, err := client.Query(search)
+	switch err {
+	case crossref.ErrZeroWorks:
+		fmt.Println("No works found")
+	case crossref.ErrEmptyQuery:
+		fmt.Println("An empty query was requested")
+	case nil:
+	default:
+		panic(err)
+	}
 
-    fmt.Println("Found:")
-    fmt.Println(" >", work.Title, work.Authors, work.Date)
+	fmt.Printf("Found %d article(s) for query:\n > %q\n", len(works), search)
 
-    // Search for a publication by doing a query. This returns up to 10 works
-    // that match the query terms.
-    works, err := client.Query("Slow Robots for Unobtrusive Posture Correction")
-    if err != nil {
-        panic(err)
-    }
+	// Retrieve information directly from a DOI
+	doi := works[0].DOI
+	work, err := client.DOI(doi)
+	switch err {
+	case crossref.ErrZeroWorks:
+		fmt.Println("No works found")
+	case crossref.ErrEmptyQuery:
+		fmt.Println("An empty query was requested")
+	case nil:
+	default:
+		panic(err)
+	}
 
-    fmt.Println("Found", len(works), "article(s):")
-    for _, work := range works {
-        fmt.Println(" >", work.Title, work.Authors, work.Date)
-    }
+	fmt.Printf("For DOI: %q found:\n", doi)
+	fmt.Printf(" > %q, (%v) %q\n", work.Title, work.Date, work.Authors)
+
+	// Output:
+	// Found 10 article(s) for query:
+	//  > "Slow Robots for Unobtrusive Posture Correction"
+	// For DOI: "10.1145/3290605.3300843" found:
+	//  > "Slow Robots for Unobtrusive Posture Correction", (2019) ["Shin, Joon-Gi" "Onchi, Eiji" "Reyes, Maria Jose" "Song, Junbong" "Lee, Uichin" "Lee, Seung-Hee" "Saakes, Daniel"]
 }
 ```
