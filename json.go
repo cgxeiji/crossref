@@ -61,7 +61,7 @@ type Work struct {
 
 	Issue    string   `json:"issue"`
 	Volume   string   `json:"volume"`
-	Pages    string   `json:"pages"`
+	Pages    string   `json:"page"`
 	ISSNs    []string `json:"ISSN"`
 	ISSN     string
 	ISBNs    []string `json:"ISBN"`
