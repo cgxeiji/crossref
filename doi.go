@@ -36,6 +36,7 @@ func (c *Client) DOIJSON(doi string) ([]byte, error) {
 
 	resp, err := c.Do(req)
 	if err != nil {
+		log.Debug(err)
 		return nil, err
 	}
 	defer resp.Body.Close()

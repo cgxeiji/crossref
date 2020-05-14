@@ -22,7 +22,7 @@ func NewClient(appname, malito string) *Client {
 	c := Client{
 		mailto:  malito,
 		appname: appname,
-		Client:  http.Client{Timeout: 5 * time.Second},
+		Client:  http.Client{Timeout: 30 * time.Second},
 	}
 
 	log.WithFields(log.Fields{
@@ -43,7 +43,8 @@ func (c *Client) newRequest(method, url string, body io.Reader) (*http.Request, 
 		return nil, err
 	}
 
-	r.Header.Add("User-Agent", fmt.Sprintf("%s/0.0 (mailto: %s)", c.appname, c.mailto))
+	r.Header.Add("User-Agent", fmt.Sprintf("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36 %s/1.0 (https://github.com/cgxeiji/crossref; mailto:%s)", c.appname, c.mailto))
+	log.Debug(r.UserAgent())
 
 	return r, nil
 }
